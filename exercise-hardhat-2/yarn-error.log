@@ -1,0 +1,42 @@
+Arguments: 
+  /usr/local/bin/node /home/becco/.cache/node/corepack/yarn/1.22.19/bin/yarn.js add @openzeppelin
+
+PATH: 
+  /home/becco/.cargo/bin:/home/becco/.local/bin:/home/becco/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/usr/bin/mvn:/home/becco/.foundry/bin:/usr/bin/mvn:/home/becco/.foundry/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.17.1
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@openzeppelin: Request "https://registry.yarnpkg.com/@openzeppelin" returned a 405
+      at params.callback [as _callback] (/home/becco/.cache/node/corepack/yarn/1.22.19/lib/cli.js:66154:18)
+      at self.callback (/home/becco/.cache/node/corepack/yarn/1.22.19/lib/cli.js:140890:22)
+      at Request.emit (node:events:514:28)
+      at Request.<anonymous> (/home/becco/.cache/node/corepack/yarn/1.22.19/lib/cli.js:141862:10)
+      at Request.emit (node:events:514:28)
+      at IncomingMessage.<anonymous> (/home/becco/.cache/node/corepack/yarn/1.22.19/lib/cli.js:141784:12)
+      at Object.onceWrapper (node:events:628:28)
+      at IncomingMessage.emit (node:events:526:35)
+      at endReadableNT (node:internal/streams/readable:1359:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+npm manifest: 
+  {
+    "name": "hardhat-project",
+    "devDependencies": {
+      "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+      "hardhat": "^2.17.4"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
