@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/WasteManagement.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.20;\n\nerror WasteManagement__NotOwner();\nerror WasteManagement__NotAdmin();\nerror WasteManagement__CategoryNotAccepted();\n\ncontract WasteManagement {\n    enum WasteCategory {\n        Anorganic,\n        Organic,\n        Recyclable\n    }\n\n    struct Waste {\n        uint256 id;\n        string category;\n        uint256 amountInKg;\n        uint256 totalPrice;\n    }\n\n    mapping(address => mapping(uint256 => Waste)) public ownerWaste;\n    mapping(address => uint256) ownerWasteCount;\n    mapping(WasteCategory => string) wasteCategoryToName;\n    mapping(string => uint256) public wasteCategoryPrice;\n    mapping(string => bool) public acceptedWasteCategory;\n    mapping(address => uint256) public balanceOf;\n    mapping(address => bool) public isAdmin;\n    address public immutable i_owner;\n\n    event StoreWaste(\n        address indexed sender,\n        address indexed wasteOwner,\n        uint256 indexed wasteId,\n        string category,\n        uint256 wasteQuantity,\n        uint256 wasteTotalPrice\n    );\n\n    event UpdateWaste(\n        address indexed sender,\n        address indexed wasteOwner,\n        uint256 indexed wasteId,\n        string newCategory,\n        uint256 newWasteQty,\n        uint256 newWasteTotalPrice\n    );\n\n    event AddAdmin(address indexed sender, address addedAdmin);\n\n    event RevokeAdmin(address indexed sender, address revokedAdmin);\n\n    modifier onlyOwner() {\n        if (msg.sender != i_owner) {\n            revert WasteManagement__NotOwner();\n        }\n        _;\n    }\n\n    modifier onlyAdmin() {\n        if (isAdmin[msg.sender] != true) {\n            revert WasteManagement__NotAdmin();\n        }\n        _;\n    }\n\n    modifier checkCategory(string calldata _category) {\n        if (acceptedWasteCategory[_category] != true) {\n            revert WasteManagement__CategoryNotAccepted();\n        }\n        _;\n    }\n\n    constructor() {\n        wasteCategoryToName[WasteCategory.Anorganic] = \"Anorganic\";\n        wasteCategoryToName[WasteCategory.Organic] = \"Organic\";\n        wasteCategoryToName[WasteCategory.Recyclable] = \"Recyclable\";\n\n        wasteCategoryPrice[wasteCategoryToName[WasteCategory.Anorganic]] = 1;\n        wasteCategoryPrice[wasteCategoryToName[WasteCategory.Organic]] = 2;\n        wasteCategoryPrice[wasteCategoryToName[WasteCategory.Recyclable]] = 3;\n\n        acceptedWasteCategory[\n            wasteCategoryToName[WasteCategory.Anorganic]\n        ] = true;\n        acceptedWasteCategory[\n            wasteCategoryToName[WasteCategory.Organic]\n        ] = true;\n        acceptedWasteCategory[\n            wasteCategoryToName[WasteCategory.Recyclable]\n        ] = true;\n\n        i_owner = msg.sender;\n        isAdmin[i_owner] = true;\n    }\n\n    function addAdmin(address _admin) external onlyOwner {\n        isAdmin[_admin] = true;\n\n        emit AddAdmin(msg.sender, _admin);\n    }\n\n    function revokeAdmin(address _admin) external onlyOwner {\n        isAdmin[_admin] = true;\n\n        emit RevokeAdmin(msg.sender, _admin);\n    }\n\n    function getWasteCategory() external view returns (string[3] memory) {\n        return [\n            wasteCategoryToName[WasteCategory.Anorganic],\n            wasteCategoryToName[WasteCategory.Organic],\n            wasteCategoryToName[WasteCategory.Recyclable]\n        ];\n    }\n\n    function storeWaste(\n        address _wasteOwner,\n        string calldata _wasteCategory,\n        uint256 _wasteQty\n    ) external onlyAdmin checkCategory(_wasteCategory) {\n        uint256 currentWasteId = getOwnerWasteCount();\n        uint256 wasteTotalPrice = _wasteQty *\n            wasteCategoryPrice[_wasteCategory];\n\n        Waste memory waste = Waste(\n            currentWasteId,\n            _wasteCategory,\n            _wasteQty,\n            wasteTotalPrice\n        );\n        ownerWaste[_wasteOwner][currentWasteId] = waste;\n\n        balanceOf[_wasteOwner] += wasteTotalPrice;\n\n        ownerWasteCount[msg.sender]++;\n        emit StoreWaste(\n            msg.sender,\n            _wasteOwner,\n            currentWasteId,\n            _wasteCategory,\n            _wasteQty,\n            wasteTotalPrice\n        );\n    }\n\n    function updateWaste(\n        address _wasteOwner,\n        uint256 _wasteId,\n        string calldata _wasteCategory,\n        uint256 _wasteQty\n    ) external onlyAdmin checkCategory(_wasteCategory) {\n        Waste memory waste = ownerWaste[_wasteOwner][_wasteId];\n\n        balanceOf[_wasteOwner] -= waste.totalPrice;\n\n        waste.category = _wasteCategory;\n        waste.amountInKg = _wasteQty;\n        waste.totalPrice = _wasteQty * wasteCategoryPrice[_wasteCategory];\n\n        ownerWaste[_wasteOwner][_wasteId] = waste;\n        balanceOf[_wasteOwner] += waste.totalPrice;\n\n        emit UpdateWaste(\n            msg.sender,\n            _wasteOwner,\n            _wasteId,\n            waste.category,\n            waste.amountInKg,\n            waste.totalPrice\n        );\n    }\n\n    function getOwnerWasteCount() internal view returns (uint256) {\n        return ownerWasteCount[msg.sender];\n    }\n}\n\n/* \n    \"0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2\",\"Organic\",10\n\n    \"0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2\",0,\"Organic\",20\n*/\n"
+    }
+  },
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
